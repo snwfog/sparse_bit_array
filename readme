@@ -1,1 +1,23 @@
-# Sparse Bit Vector
+# Sparse Bit Array
+
+## Description
+A space efficient sparse bit array (or vector) for Ruby.
+Inspired from https://github.com/brettwooldridge/SparseBitSet.
+
+## Assumptions
+- Index starts at *zero*
+
+## Usage
+
+```ruby
+bit_array = SparseBitArray.new(1000)
+bit_array[0] = true
+bit_array.set(0)
+
+bit_array[0] # => true
+
+bit_array[0] = false
+bit_array.clear(0)
+
+bit_arrayp0] # => false
+```
