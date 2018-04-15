@@ -14,6 +14,15 @@ class TestSparseBit < MiniTest::Unit::TestCase
     (0...1_000).each { |i| @b.clear(i); assert_equal false, @b.get(i) }
   end
 
+  def test_flip_get_bit
+    (0...1_000).each do |i|
+      @b.flip(i)
+      assert_equal true, @b[i]
+      @b.flip(i)
+      assert_equal false, @b[i]
+    end
+  end
+
   def test_index_out_of_bound
     assert_raises(SparseBitArray::IndexOutOfBound) { @b.set(1000) }
     assert_raises(SparseBitArray::IndexOutOfBound) { @b.set(-1) }

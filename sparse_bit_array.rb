@@ -1,7 +1,8 @@
 # Sparse bit array for Ruby
 # Inspired from https://github.com/brettwooldridge/SparseBitSet
 class SparseBitArray
-  class IndexOutOfBound < RuntimeError; end
+  class IndexOutOfBound < RuntimeError;
+  end
 
   WIDTH  = 1.size * 8
   MAX    = 1 << (WIDTH - 2) - 1
@@ -24,7 +25,7 @@ class SparseBitArray
     t2             = @tree[b1] ||= Array.new(1 << BLOCK2)
     t3             = t2[b2] ||= Array.new(1 << BLOCK3)
     mask           = 1 << b4
-    t3[b3]         = t3[b3] ? (t3[b3] | mask) : mask
+    t3[b3]         = t3[b3] ? t3[b3] | mask : mask
   end
 
   def clear(index)
@@ -32,10 +33,18 @@ class SparseBitArray
     t2             = @tree[b1] ||= Array.new(1 << BLOCK2)
     t3             = t2[b2] ||= Array.new(1 << BLOCK3)
 
-    if t3[b3]
-      t3[b3] &= ~(1 << b4)
-      t3[b3] = nil if t3[b3].zero?
-    end
+    t3[b3] = t3[b3] ? t3[b3] & ~(1 << b4) : 0
+    t3[b3] = nil if t3[b3].zero?
+  end
+
+  def flip(index)
+    b1, b2, b3, b4 = _calculate_block_indices(index)
+    t2             = @tree[b1] ||= Array.new(1 << BLOCK2)
+    t3             = t2[b2] ||= Array.new(1 << BLOCK3)
+
+    mask   = 1 << b4
+    t3[b3] = t3[b3] ? t3[b3] ^ mask : mask
+    t3[b3] = nil if t3[b3].zero?
   end
 
   def get(index)
@@ -70,4 +79,5 @@ class SparseBitArray
     b4 = index % WIDTH
     [b1, b2, b3, b4]
   end
+
 end
