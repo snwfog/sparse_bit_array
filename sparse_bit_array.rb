@@ -36,30 +36,22 @@ class SparseBitArray
   end
 
   def set(index)
-    b1, b2, b3, b4 = _calculate_block_indices(index)
-    t2             = @block1[b1] ||= Array.new(1 << BLOCK2)
-    t3             = t2[b2] ||= Array.new(1 << BLOCK3)
-    mask           = 1 << b4
-    t3[b3]         = t3[b3] ? t3[b3] | mask : mask
+    block4, mask = get_block4(index), 1 << index % WIDTH
+    set_block4(index, block4 ? (block4 | mask) : mask)
   end
 
   def clear(index)
-    b1, b2, b3, b4 = _calculate_block_indices(index)
-    t2             = @block1[b1] ||= Array.new(1 << BLOCK2)
-    t3             = t2[b2] ||= Array.new(1 << BLOCK3)
-
-    t3[b3] = t3[b3] ? t3[b3] & ~(1 << b4) : 0
-    t3[b3] = nil if t3[b3].zero?
+    block4, mask = get_block4(index), ~(1 << index % WIDTH)
+    value        = block4 ? block4 & mask : 0
+    value        = nil if value.zero?
+    set_block4(index, value)
   end
 
   def flip(index)
-    b1, b2, b3, b4 = _calculate_block_indices(index)
-    t2             = @block1[b1] ||= Array.new(1 << BLOCK2)
-    t3             = t2[b2] ||= Array.new(1 << BLOCK3)
-
-    mask   = 1 << b4
-    t3[b3] = t3[b3] ? t3[b3] ^ mask : mask
-    t3[b3] = nil if t3[b3].zero?
+    block4, mask = get_block4(index), 1 << index % WIDTH
+    value        = block4 ? block4 ^ mask : mask
+    value        = nil if value.zero?
+    set_block4(index, value)
   end
 
   def get(index)
