@@ -2,6 +2,7 @@
 # Inspired from https://github.com/brettwooldridge/SparseBitSet
 class SparseBitArray
   # include Enumerable
+  VERSION = '1.0.0'.freeze
 
   class IndexOutOfBound < RuntimeError
   end
