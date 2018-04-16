@@ -28,6 +28,75 @@ class TestSparseBit < MiniTest::Unit::TestCase
     assert_raises(SparseBitArray::IndexOutOfBound) { @b.set(-1) }
   end
 
+  def test_each
+    bit_array               = SparseBitArray.new(1 << 17)
+    bit_array[0], blk_count = true, 0
+    bit_array.each { blk_count += 1 }
+    assert_equal 1, blk_count
+
+    bit_array[1 << 11], blk_count = true, 0
+    bit_array[2 * (1 << 11)]      = true
+    bit_array[3 * (1 << 11)]      = true
+    bit_array[4 * (1 << 11)]      = true
+    bit_array.each { blk_count += 1 }
+    assert_equal 5, blk_count
+  end
+
+  def test_to_s
+    bit_array    = SparseBitArray.new(8)
+    bit_array[0] = bit_array[7] = true
+    assert_equal '10000001', bit_array.to_s
+  end
+
+  def test_xor
+    bit_array1    = SparseBitArray.new(4)
+    bit_array2    = SparseBitArray.new(8)
+    bit_array1[0] = bit_array1[1] = true
+    bit_array2[0] = bit_array2[2] = true
+    bit_array     = bit_array1 ^ bit_array2
+    assert_equal '01100000', bit_array.to_s
+
+    bit_array = bit_array2 ^ bit_array1
+    assert_equal '01100000', bit_array.to_s
+  end
+
+  def test_or
+    bit_array1    = SparseBitArray.new(4)
+    bit_array2    = SparseBitArray.new(8)
+    bit_array1[0] = bit_array1[1] = true
+    bit_array2[0] = bit_array2[2] = true
+    bit_array     = bit_array1 | bit_array2
+    assert_equal '11100000', bit_array.to_s
+
+    bit_array = bit_array2 | bit_array1
+    assert_equal '11100000', bit_array.to_s
+  end
+
+
+  def test_and
+    bit_array1    = SparseBitArray.new(4)
+    bit_array2    = SparseBitArray.new(8)
+    bit_array1[0] = bit_array1[1] = true
+    bit_array2[0] = bit_array2[2] = true
+    bit_array     = bit_array1 & bit_array2
+    assert_equal '10000000', bit_array.to_s
+
+    bit_array = bit_array2 & bit_array1
+    assert_equal '10000000', bit_array.to_s
+  end
+
+  def test_block_level_1
+    assert_equal 1, SparseBitArray.new(1).stats[:block1_size]
+    assert_equal 1, SparseBitArray.new(2).stats[:block1_size]
+    assert_equal 1, SparseBitArray.new((1 << 16) - 1).stats[:block1_size]
+    assert_equal 2, SparseBitArray.new((1 << 16)).stats[:block1_size]
+    assert_equal 2, SparseBitArray.new(2 * (1 << 16) - 1).stats[:block1_size]
+    assert_equal 4, SparseBitArray.new(2 * (1 << 16)).stats[:block1_size]
+    assert_equal 4, SparseBitArray.new(3 * (1 << 16)).stats[:block1_size]
+    assert_equal 8, SparseBitArray.new(4 * (1 << 16)).stats[:block1_size]
+    assert_equal 8, SparseBitArray.new(7 * (1 << 16)).stats[:block1_size]
+  end
+
   def test_stats
     bit_array    = SparseBitArray.new(1 << 13)
     bit_array[0] = true # 1 level 3 block

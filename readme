@@ -1,7 +1,7 @@
 # Sparse Bit Array
 
 ## Description
-A space efficient sparse bit array (or vector) for Ruby.
+A space efficient sparse bit array for Ruby.
 Inspired from https://github.com/brettwooldridge/SparseBitSet.
 
 ## Assumptions
